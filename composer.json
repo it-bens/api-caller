@@ -1,0 +1,40 @@
+{
+  "name": "it-bens/api-caller",
+  "description": "Wrapper to perform API requests with limit and offset over a response series.",
+  "type": "package",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Martin Bens",
+      "email": "martin.bens@it-bens.de"
+    }
+  ],
+  "require": {
+    "php": "^8.0"
+  },
+  "require-dev": {
+    "captainhook/plugin-composer": "^5.3",
+    "phpstan/phpstan": "^1.0",
+    "phpunit/phpunit": "^9.5",
+    "roave/security-advisories": "dev-latest"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "ITB\\ApiCaller\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ITB\\ApiCaller\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "vendor/bin/captainhook install -f -s"
+    ]
+  }
+}
