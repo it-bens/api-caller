@@ -1,0 +1,68 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: "Run tests on PHP ${{ matrix.php-version }}."
+    if: "!contains(github.event.head_commit.message, 'WIP')"
+
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-20.04 ]
+        php-version: [ "8.0", "8.1" ]
+        experimental: [ false ]
+
+    environment: test
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: intl, xdebug
+          coverage: xdebug
+          tools: phive, composer:v2
+      - name: "Cache Composer dependencies"
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+      - name: "Copy required composer.lock"
+        uses: canastro/copy-file-action@master
+        with:
+          source: "./tests/config/composer.lock"
+          target: "./composer.lock"
+      - name: "Install Composer dependencies"
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-version }}
+          dev: yes
+          args: --no-interaction --no-progress --no-suggest --optimize-autoloader
+      - name: "PHPUnit Tests"
+        uses: php-actions/phpunit@v2
+        with:
+          php_extensions: intl xdebug
+          bootstrap: vendor/autoload.php
+          configuration: phpunit.xml.dist
+          exclude_group: local-only
+          args: --coverage-clover ./coverage.xml
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          XDEBUG_MODE: coverage
+      - name: "PHPStan Static Analysis"
+        run: vendor/bin/phpstan analyse src tests --level 8
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
+          verbose: true
