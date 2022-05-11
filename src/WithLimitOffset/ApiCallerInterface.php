@@ -7,11 +7,11 @@ namespace ITB\ApiCaller\WithLimitOffset;
 interface ApiCallerInterface
 {
     /**
-     * @param int $currentLimit
-     * @param int $currentOffset
+     * @param int $limit
+     * @param int $offset
      * @return ApiCallerResponse
      */
-    public function doRequest(int $currentLimit, int $currentOffset): ApiCallerResponse;
+    public function doRequest(int $limit, int $offset): ApiCallerResponse;
 
     /**
      * @return int

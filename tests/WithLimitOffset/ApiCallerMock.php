@@ -19,9 +19,9 @@ final class ApiCallerMock implements ApiCallerInterface
         }
     }
 
-    public function doRequest(int $currentLimit, int $currentOffset): ApiCallerResponse
+    public function doRequest(int $limit, int $offset): ApiCallerResponse
     {
-        $results = array_slice($this->items, $currentOffset, $currentLimit);
+        $results = array_slice($this->items, $offset, $limit);
 
         return new ApiCallerResponse($results);
     }
