@@ -9,9 +9,9 @@ use ITB\ApiCaller\WithPageToken\ApiCallerResponse;
 
 final class ApiCallerMock implements ApiCallerInterface
 {
-    /** @phpstan-ignore-next-line */
+    /** @var mixed[] */
     private array $items = [];
-    /** @phpstan-ignore-next-line */
+    /** @var array<string, mixed> $pages */
     private array $pages = [];
 
     public function __construct(private int $itemCount, private int $maxResultsPerRequest)
@@ -26,7 +26,7 @@ final class ApiCallerMock implements ApiCallerInterface
         return $this->maxResultsPerRequest;
     }
 
-    public function doFollowUpRequest(string $pageToken): ApiCallerResponse
+    public function doFollowUpRequest(string $pageToken, array $parameters): ApiCallerResponse
     {
         $results = $this->pages[$pageToken];
 
@@ -39,7 +39,7 @@ final class ApiCallerMock implements ApiCallerInterface
         return new ApiCallerResponse($results, $nextPageToken);
     }
 
-    public function doInitialRequest(?int $limit = null, int $offset = 0): ApiCallerResponse
+    public function doInitialRequest(?int $limit, int $offset, array $parameters): ApiCallerResponse
     {
         $limit = (null === $limit || $limit > $this->maxResultsPerRequest) ? $this->maxResultsPerRequest : $limit;
 

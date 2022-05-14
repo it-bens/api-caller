@@ -7,13 +7,13 @@ namespace ITB\ApiCaller\WithLimitOffset;
 trait ApiCallerWrapper
 {
     /**
-     * @phpstan-ignore-next-line
      * @param ApiCallerInterface $apiCaller
      * @param int|null $limit
      * @param int $offset
-     * @return array
+     * @param mixed[] $parameters
+     * @return mixed[]
      */
-    public function request(ApiCallerInterface $apiCaller, ?int $limit = null, int $offset = 0): array
+    public function request(ApiCallerInterface $apiCaller, ?int $limit = null, int $offset = 0, array $parameters = []): array
     {
         $remainingResults = $limit;
 
@@ -26,7 +26,7 @@ trait ApiCallerWrapper
                 $limit = $remainingResults;
             }
 
-            $response = $apiCaller->doRequest($limit, $offset);
+            $response = $apiCaller->doRequest($limit, $offset, $parameters);
             $results = array_merge($results, $response->results);
             $offset += $limit;
 

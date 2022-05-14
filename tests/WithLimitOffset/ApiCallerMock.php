@@ -9,7 +9,7 @@ use ITB\ApiCaller\WithLimitOffset\ApiCallerResponse;
 
 final class ApiCallerMock implements ApiCallerInterface
 {
-    /** @phpstan-ignore-next-line */
+    /** @var mixed[] */
     private array $items = [];
 
     public function __construct(private int $itemCount, private int $maxResultsPerRequest)
@@ -19,7 +19,7 @@ final class ApiCallerMock implements ApiCallerInterface
         }
     }
 
-    public function doRequest(int $limit, int $offset): ApiCallerResponse
+    public function doRequest(int $limit, int $offset, array $parameters): ApiCallerResponse
     {
         $results = array_slice($this->items, $offset, $limit);
 

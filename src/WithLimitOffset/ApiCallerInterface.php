@@ -9,9 +9,10 @@ interface ApiCallerInterface
     /**
      * @param int $limit
      * @param int $offset
+     * @param mixed[] $parameters
      * @return ApiCallerResponse
      */
-    public function doRequest(int $limit, int $offset): ApiCallerResponse;
+    public function doRequest(int $limit, int $offset, array $parameters): ApiCallerResponse;
 
     /**
      * @return int

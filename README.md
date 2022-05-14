@@ -25,6 +25,8 @@ It requires at least PHP 8. It was tests against PHP 8.1 as well.
 First, you have to determine if the API you would like to call uses limit and offset or page tokens.
 In both cases a specific API caller implementing the `ApiCallerInterface` has to be created.
 
+An array of parameters required for the actual request can be passed to the wrapper request method.
+
 ### API with limit and offset
 ```php
 use ITB\ApiCaller\WithLimitOffset\ApiCallerInterface;
@@ -34,15 +36,15 @@ class SpecificApiCaller implements ApiCallerInterface
 {
     private const MAX_RESULTS_PER_REQUEST = 10;
 
-    public function __construct(private string $parameter1, private int $parameter2) {}
+    public function __construct() {}
 
-    public function doRequest(int $limit, int $offset): ApiCallerResponse
+    public function doRequest(int $limit, int $offset, array $parameters): ApiCallerResponse
     {
         $items = doSomeApiCall([
             'limit' => $limit,
             'offset' => $offset,
-            'parameter1' => $this->parameter1,
-            'parameter2' => $this->parameter2
+            'greeting1' => $parameters['greeting1'],
+            'greeting2' => $parameters['greeting2']
         ]);
         return new ApiCallerResponse($items);
     }
@@ -69,9 +71,9 @@ class SomeService
     {
         $apiCaller = new SpecificApiCaller('This is the way!', 1337);
         
-        $items = $this->request($apiCaller, null, 10);
+        $items = $this->request($apiCaller, null, 10, ['greeting1' => 'Ahoi', 'greeting2' => 'Hi']);
         // OR:
-        $items = $this->request($apiCaller, 100, 10);
+        $items = $this->request($apiCaller, 100, 10, ['greeting1' => 'Ahoi', 'greeting2' => 'Hi']);
         
         // ...
     }
@@ -91,28 +93,28 @@ class AnotherSpecificApiCaller implements ApiCallerInterface
 {
     private const MAX_RESULTS_PER_REQUEST = 10;
 
-    public function __construct(private string $parameter1, private int $parameter2) {}
+    public function __construct() {}
 
-    public function doFollowUpRequest(string $pageToken): ApiCallerResponse
+    public function doFollowUpRequest(string $pageToken, array $parameters): ApiCallerResponse
     {
         $response = doSomeApiCall([
             'pageToken' => $pageToken,
-            'parameter1' => $this->parameter1,
-            'parameter2' => $this->parameter2
+            'greeting1' => $parameters['greeting1'],
+            'greeting2' => $parameters['greeting2']
         ]);
 
         return new ApiCallerResponse($response['items'], $response['nextPageToken']);
     }
 
-    public function doInitialRequest(?int $limit = null, int $offset = 0): ApiCallerResponse
+    public function doInitialRequest(?int $limit, int $offset, array $parameters): ApiCallerResponse
     {
         $limit = (null === $limit || $limit > self::MAX_RESULTS_PER_REQUEST) ? self::MAX_RESULTS_PER_REQUEST : $limit;
 
         $response = doSomeApiCall([
             'limit' => $limit,
             'offset' => $offset,
-            'parameter1' => $this->parameter1,
-            'parameter2' => $this->parameter2
+            'greeting1' => $parameters['greeting1'],
+            'greeting2' => $parameters['greeting2']
         ]);
 
         return new ApiCallerResponse($response['items'], $response['nextPageToken']);
@@ -134,9 +136,9 @@ class SomeService
     {
         $apiCaller = new AnotherSpecificApiCaller('This is the way!', 1337);
         
-        $items = $this->request($apiCaller, null, 10);
+        $items = $this->request($apiCaller, null, 10, ['greeting1' => 'Ahoi', 'greeting2' => 'Hi']);
         // OR:
-        $items = $this->request($apiCaller, 100, 10);
+        $items = $this->request($apiCaller, 100, 10, ['greeting1' => 'Ahoi', 'greeting2' => 'Hi']);
         
         // ...
     }
